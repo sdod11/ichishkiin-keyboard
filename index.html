@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ichishkíin Keyboard</title>
+  <style>
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+                 "Noto Sans", "Arial Unicode MS", sans-serif;
+    background: #ffe3cd;
+    color: #222;
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px;
+    line-height: 1.5;
+  }
+
+  h1 {
+    font-weight: 600;
+    margin-bottom: 0.5em;
+  }
+
+  p {
+    color: #555;
+  }
+
+  textarea {
+    width: 100%;
+    font-size: 1.5rem;
+    line-height: 1.6;
+    padding: 16px;
+    margin-top: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    resize: vertical;
+  }
+
+  button {
+    margin-top: 16px;
+    padding: 10px 18px;
+    font-size: 1rem;
+    border-radius: 6px;
+    border: none;
+    background: #333;
+    color: white;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background: #000;
+  }
+  #copyStatus {
+  margin-top: 10px;
+  color: #2c7;
+  font-weight: 500;
+}
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#infoBtn {
+  font-size: 1.1rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+#cheatSheet {
+  background: #fff;
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin: 16px 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+#cheatSheet h2 {
+  margin-top: 0;
+  font-size: 1.1rem;
+}
+
+#cheatSheet ul {
+  padding-left: 20px;
+}
+
+#cheatSheet li {
+  margin-bottom: 6px;
+}
+#cheatSheet hr {
+  border: none;
+  border-top: 1px solid #eee;
+  margin: 16px 0;
+}
+
+.credits {
+  font-size: 0.85rem;
+  color: #666;
+  line-height: 1.4;
+}
+
+</style>
+</head>
+<body>
+  <div class="header">
+  <h1>Ichishkíin Keyboard</h1>
+  <div class="nav">
+  <a href="index.html">Ichishkiin</a>
+  <a href="umatilla.html">Umatilla/Wahuupam</a>
+  <button id="infoBtn" aria-label="Show keyboard help">ℹ️</button>
+</div>
+</div>
+<div id="cheatSheet" style="display:none;">
+  <h2>Keyboard Bindings</h2>
+
+  <ul>
+    <li><strong>Alt + a</strong> → á</li>
+    <li><strong>Alt + i</strong> → í</li>
+    <li><strong>o</strong> → ɨ
+    <li><strong>Alt + o</strong> → ɨ́</li>
+    <li><strong>Alt + u</strong> → ú</li>
+    <li><strong>x</strong> → x̱</li>
+    <li><strong>Alt + x</strong> → x</li>
+    <li><strong>Alt + k</strong> → ḵ</li>
+    <li><strong>Alt + l</strong> → ł</li>
+  </ul>
+  <hr>
+
+<p class="credits">
+  Created by Sam Dody<br>
+</p>
+</div>
+
+  <p>
+  Type using the Ichishkíin keyboard mapping.
+  Use <strong>Alt</strong> for accented vowels and special consonants. Press the info button above for key binds.
+</p>
+
+  <textarea id="editor" rows="10" cols="80"></textarea>
+
+  <br><br>
+
+  <button id="copyBtn">Copy to clipboard</button>
+  <button id="downloadBtn">Download for offline use</button>
+  <p id="copyStatus" style="display:none;">Copied!</p>
+
+</body>
+<script>
+  const editor = document.getElementById("editor");
+
+  const mappings = {
+    // Vowels
+    "a": { normal: "a", alt: "á" },
+    "i": { normal: "i", alt: "í" },
+    "o": { normal: "ɨ", alt: "ɨ́" },
+    "u": { normal: "u", alt: "ú" },
+
+    // Consonants
+    "x": { normal: "x̱", alt: "x" },
+    "k": { normal: "k", alt: "ḵ" },
+    "l": { normal: "l", alt: "ł" }
+  };
+
+  const blockedKeys = ["r", "d", "g", "j", "z", "b", "e"];
+  editor.addEventListener("keydown", function (event) {
+    const key = event.key.toLowerCase();
+
+    // Allow control keys (backspace, arrows, etc.)
+    if (event.ctrlKey || event.metaKey || event.key.length > 1) {
+      return;
+    }
+
+    // Block unwanted keys
+    if (blockedKeys.includes(key)) {
+      event.preventDefault();
+      return;
+    }
+
+    // Handle mapped keys
+    if (mappings[key]) {
+      event.preventDefault();
+
+      let output = event.altKey
+        ? mappings[key].alt
+        : mappings[key].normal;
+
+      // Handle uppercase
+      if (event.shiftKey) {
+        output = output.toUpperCase();
+      }
+
+      insertAtCursor(editor, output);
+    }
+  });
+
+  function insertAtCursor(textarea, text) {
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const value = textarea.value;
+
+    textarea.value =
+      value.slice(0, start) + text + value.slice(end);
+
+    textarea.selectionStart = textarea.selectionEnd =
+      start + text.length;
+  }
+  const copyBtn = document.getElementById("copyBtn");
+const copyStatus = document.getElementById("copyStatus");
+
+copyBtn.addEventListener("click", function () {
+  editor.select();
+  document.execCommand("copy");
+
+  copyStatus.style.display = "block";
+
+  setTimeout(() => {
+    copyStatus.style.display = "none";
+  }, 1200);
+});
+const infoBtn = document.getElementById("infoBtn");
+const cheatSheet = document.getElementById("cheatSheet");
+
+infoBtn.addEventListener("click", function () {
+  cheatSheet.style.display =
+    cheatSheet.style.display === "none" ? "block" : "none";
+});
+const downloadBtn = document.getElementById("downloadBtn");
+
+downloadBtn.addEventListener("click", function () {
+  const htmlContent = document.documentElement.outerHTML;
+  const blob = new Blob([htmlContent], { type: "text/html" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "ichishkiin-keyboard.html";
+  document.body.appendChild(a);
+  a.click();
+
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+</script>
+</html>
