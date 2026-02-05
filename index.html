@@ -163,7 +163,13 @@
 
   const blockedKeys = ["r", "d", "g", "j", "z", "b", "e"];
   editor.addEventListener("keydown", function (event) {
-    const key = event.key.toLowerCase();
+  // Stop macOS Option key from inserting its own characters
+  if (event.altKey) {
+    event.preventDefault();
+  }
+
+  const key = event.key.toLowerCase();
+
 
     // Allow control keys (backspace, arrows, etc.)
     if (event.ctrlKey || event.metaKey || event.key.length > 1) {
@@ -241,4 +247,5 @@ downloadBtn.addEventListener("click", function () {
   URL.revokeObjectURL(url);
 });
 </script>
+</body>
 </html>
